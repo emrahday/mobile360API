@@ -1,5 +1,5 @@
 // do not start express server manually
-// run 'npm run test-watch' in order to run mocha test under nodemon
+// run 'npm run watch' in order to run mocha test under nodemon
 // it will automatically run express server and will listen port
 
 const chai = require('chai');
@@ -33,7 +33,7 @@ describe ('create and get items', () => {
     let latLng;
     let _id;
     before(function() {
-        this.skip();
+        // this.skip();
         latLng = utils.getRandomLatLng();
     });
     it ('should create an item and return', (done) => {
@@ -286,7 +286,9 @@ describe ('check is item in range', () => {
     it ('should NOT be in circle range', (done) => {
         done();
     });
+
 });
+
 
 
 

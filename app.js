@@ -54,6 +54,7 @@ app.get('/get/item', (req, res) => {
     })
 });
 
+
 app.get('/get/items/square', (req, res) => {
     item.getInSquareRange({
         lat: Number(req.query.lat),
@@ -106,7 +107,8 @@ app.get('/check/item/square', (req, res) => {
     })
 });
 
-
-app.listen(3000, () => console.log('Listening to port 3000'));
+if (!module.parent) {
+    app.listen(3000, () => console.log('Listening to port 3000'));
+}
 
 module.exports = app;
