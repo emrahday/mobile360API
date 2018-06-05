@@ -10,6 +10,10 @@ chai.use(chaiHttp);
 
 describe ('status', () => {
     
+    before(function() {
+        this.skip();
+    });
+
     it ('should have minimum open connection', (done) => {
         dbutil.connect()
         .then( db => {

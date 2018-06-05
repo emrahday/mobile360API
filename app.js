@@ -11,11 +11,8 @@ app.get('/', (req, res) => {
     });
 });
 
-app.post('/item', (req, res) => {
-    item.create({
-        lat: Number(req.body.lat),
-        lng: Number(req.body.lng)
-    })
+app.post('/create/item', (req, res) => {
+    item.create(req.body)
     .then( item => {
         res.send(item);
     })
@@ -27,11 +24,12 @@ app.post('/item', (req, res) => {
     });
 });
 
-app.get('/items', (req, res) => {
+app.get('/get/items', (req, res) => {
     item.get({
         lat: Number(req.query.lat),
         lng: Number(req.query.lng),
     })
+
     .then( items => {
         res.send(items);
     })
@@ -43,20 +41,68 @@ app.get('/items', (req, res) => {
     })
 });
 
-app.get('/items/range', (req, res) => {
-    item.getInRange({
-        lat: Number(req.query.lat),
-        lng: Number(req.query.lng),
-        range: Number(req.query.range),
-    })
+app.get('/get/item', (req, res) => {
+    item.getByID(req.query.id)
     .then( items => {
-        res.send();
+        res.send(items);
     })
     .catch( error => {
         res.send({
             status: 'Error',
             message: error
         })
+    })
+});
+
+app.get('/get/items/square', (req, res) => {
+    item.getInSquareRange({
+        lat: Number(req.query.lat),
+        lng: Number(req.query.lng),
+        range: Number(req.query.range)
+    })
+    .then( items => {
+        res.send(items);
+    })
+    .catch( error => {
+        res.send({
+            status: 'Error',
+            message: error
+        });
+    })
+});
+
+app.get('/get/items/circle', (req, res) => {
+    item.getInCircleRadius({
+        lat: Number(req.query.lat),
+        lng: Number(req.query.lng),
+        radius: Number(req.query.radius),
+    })
+    .then( items => {
+        res.send(items);
+    })
+    .catch( error => {
+        res.send({
+            status: 'Error',
+            message: error
+        });
+    })
+});
+
+app.get('/check/item/square', (req, res) => {
+    item.getInSquareRange({
+        _id: req.query.id,
+        lat: Number(req.query.lat),
+        lng: Number(req.query.lng),
+        range: Number(req.query.range)
+    })
+    .then( items => {
+        res.send(items);
+    })
+    .catch( error => {
+        res.send({
+            status: 'Error',
+            message: error
+        });
     })
 });
 

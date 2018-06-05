@@ -1,3 +1,5 @@
+// in order to run mongo db mongod.exe --dbpath /users/Emrah/mongo_data
+
 const {MongoClient} = require('mongodb');
 const config = require('./config');
 
