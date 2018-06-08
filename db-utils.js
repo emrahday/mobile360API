@@ -3,7 +3,7 @@
 const {MongoClient} = require('mongodb');
 const config = require('./config');
 
-module.exports = {
+const dbUtils = {
     connect: () => {
         return new Promise( (resolve, reject) => {
             MongoClient.connect(config.mongo.url, {poolSize: 10}, (err, client) => {
@@ -20,6 +20,13 @@ module.exports = {
             const result = db.executeDbAdminCommand({ serverStatus : 1, repl: 0, metrics: 0, locks: 0 });
             resolve(result);
         });
+    }, 
+    drop: db => {
+        dbUtils.connect()
+        .then ( db => {
+            db.dropDatabase();
+        });
     }
-
 }
+
+module.exports = dbUtils;

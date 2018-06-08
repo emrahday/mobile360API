@@ -7,13 +7,18 @@ const chaiHttp = require('chai-http');
 const should = chai.should();
 const app = require('./../app');
 const utils = require('./../utils');
+const dbUtils = require('./../db-utils');
+const itemUtils = require('./../item-utils');
+
 chai.use(chaiHttp); 
 
 
-describe ('utils', () => {
+describe ('init', () => {
 
     before(function() {
-        this.skip();
+        // this.skip();
+
+        dbUtils.drop(); // stateless test: clean db before test
     });
 
     it ('should return status OK', (done) => {
@@ -33,7 +38,7 @@ describe ('create and get items', () => {
     let latLng;
     let _id;
     before(function() {
-        // this.skip();
+        this.skip();
         latLng = utils.getRandomLatLng();
     });
     it ('should create an item and return', (done) => {
@@ -134,100 +139,113 @@ describe ('custom property check', () => {
     });
 });
 
-describe ('get items in range', () => {
+describe ('get items in area', () => {
 
-    let randomPoint;
-    let range; 
-    let pointsInRange;
-    let pointsOutOfRange;
+    let rectangle, polygon; 
+    let items;
 
-    before(function() {
-        this.skip();
-        range = 10;
-        // some point set in north east of world
-        basePoint = {lat:52, lng:13};
-        pointsInRange = [
-            {lat: 52.087851, lng:12.972191}, 
-            {lat: 52.024209, lng:12.860861},
-            {lat: 51.928835, lng:12.999027},
-            {lat: 51.979192, lng:13.097421}
-        ],
-        pointsOutOfRange = [
-            {lat:52.965039, lng:13.122658}, 
-            {lat:52.067094, lng:12.863713}
+    before(function(done) {
+        // this.skip();
+
+        rectangle = [
+            { lat: 7, lng: 1},
+            { lat: 1, lng: 8},
+        ];
+        polygon = [
+            { lat: 7, lng: 1},
+            { lat: 6, lng: 8},
+            { lat: 1, lng: 7},
+            { lat: 2, lng: 2},
+        ]
+        items = [
+            { lat: 7, lng: 1},          //[0] in rectangle, in polygon
+            { lat: 1, lng: 8},          //[1]  in rectangle, not in polygon
+            { lat: 2, lng: 2},          //[2]  in rectangle, in polygon
+            { lat: 4, lng: 5},          //[3]  in rectangle, in polygon
+            { lat: 1, lng: 1},          //[4]  in rectangle, not in polygon
+            { lat: 3, lng: 1.1},        //[5]  in rectangle, not in polygon
+            { lat: 6, lng: 1.1},        //[6]  in rectangle, in polygon
+            { lat: 1.1, lng: 1},        //[7]  in rectangle, in polygon
+            { lat: 1.1, lng: 6},        //[8]  in rectangle, polygon
+            { lat: 8, lng: 5},          //[9]  not in
+            { lat: 0.5, lng: 3},        //[10]  not in
+            { lat: 6, lng: 9},          //[11]  not in
+            { lat: 7.000001, lng: 1},   //[12]  not in
         ]
 
+        //create items
+        items.forEach ( (element, index) => {
+            itemUtils.create(element)
+            .then ( item => {
+                item.should.include.keys('lat', 'lng', '_id');
+                item._id.should.not.equal(null);
+                item.lat.should.equal(element.lat);
+                item.lat.should.equal(element.lat);
+                items[index]._id = item._id.toString();
+            });
+        });
+        setTimeout(() => { // TODO fix this timeout issue
+            done();
+        }, 1000);
         //TODO check also NW, SW, SE
         //TODO check if item has not lat, lng property
     });
 
-    it ('should create some item in range', (done) => {
-        pointsInRange.forEach(element => {
-            chai.request(app)
-            .post('/create/item')
-            .send(element)
-            .end((err, {status, type, body:item}) => {
-                should.not.exist(err);
-                status.should.equal(200);
-                type.should.equal('application/json');
-                item.should.include.keys('lat', 'lng', '_id');
-                item._id.should.not.equal(null);
-                item.lat.should.equal(element.lat);
-                item.lat.should.equal(element.lat);
-            })
-        });
-        done();
-    });
-
-    it ('should create some item out of range', (done) => {
-        pointsOutOfRange.forEach(element => {
-            chai.request(app)
-            .post('/create/item')
-            .send(element)
-            .end((err, {status, type, body:item}) => {
-                should.not.exist(err);
-                status.should.equal(200);
-                type.should.equal('application/json');
-                item.should.include.keys('lat', 'lng', '_id');
-                item._id.should.not.equal(null);
-                item.lat.should.equal(element.lat);
-                item.lat.should.equal(element.lat);
-            })
-        });
-        done();
-    });
-
-    it ('should return items in square range of given lat/lng', (done) => {
+    it ('should return items in rectangle', (done) => {
         chai.request(app)
-        .get(`/get/items/square?lat=${basePoint.lat}&lng=${basePoint.lng}&range=${range}`)
-        .end((err, {status, type, body:items }) =>{
+        .post(`/get/items/rectangle`)
+        .send(rectangle)
+        .end((err, {status, type, body:rectangleItems }) =>{
             should.not.exist(err);
             status.should.equal(200);
             type.should.equal('application/json');
-            items.should.to.have.length.above(3);
-            let pointsShouldNotCatched = pointsInRange.filter (item => {
-                return item.lat > 52.092067 && item.lng < 51.913163 && item.lng < 51.997977 && item.lng > 52.008690;
-            });
-            pointsShouldNotCatched.should.to.have.length(0);
+            rectangleItems.should.to.have.length.above(8);
+            rectangleItems.should.deep.include(items[0]);
+            rectangleItems.should.deep.include(items[1]);
+            rectangleItems.should.deep.include(items[2]);
+            rectangleItems.should.deep.include(items[3]);
+            rectangleItems.should.deep.include(items[4]);
+            rectangleItems.should.deep.include(items[5]);
+            rectangleItems.should.deep.include(items[6]);
+            rectangleItems.should.deep.include(items[7]);
+            rectangleItems.should.deep.include(items[8]);
+            rectangleItems.should.not.deep.include(items[9]);
+            rectangleItems.should.not.deep.include(items[10]);
+            rectangleItems.should.not.deep.include(items[11]);
+            done();
+        });
+    });
+
+    it ('should return items in polygon', (done) => {
+        chai.request(app)
+        .post(`/get/items/polygon`)
+        .send(polygon)
+        .end((err, {status, type, body:polygonItems }) =>{
+            should.not.exist(err);
+            status.should.equal(200);
+            type.should.equal('application/json');
+            // polygonItems.should.to.have.length.above(3);
+
+            polygonItems.should.deep.include(items[0]);
             done();
         })
     });
 
-    it ('should return items in circle range of given lat/lng', (done) => {
-        chai.request(app)
-        .get(`/get/items/circle?lat=${basePoint.lat}&lng=${basePoint.lng}&radius=${range}`)
-        .end((err, {status, type, body:items }) =>{
-            should.not.exist(err);
-            status.should.equal(200);
-            type.should.equal('application/json');
-            items.should.to.have.length.above(3);
-            let pointsShouldNotCatched = pointsInRange.filter (item => {
-                return item.lat > 52.092067 && item.lng < 51.913163 && item.lng < 51.997977 && item.lng > 52.008690;
-            });
-            pointsShouldNotCatched.should.to.have.length(0);
-            done();
-        })
-    });
+    // it ('should return items in circle', (done) => {
+    //     chai.request(app)
+    //     .get(`/get/items/circle?lat=${basePoint.lat}&lng=${basePoint.lng}&radius=${range}`)
+    //     .end((err, {status, type, body:items }) =>{
+    //         should.not.exist(err);
+    //         status.should.equal(200);
+    //         type.should.equal('application/json');
+    //         items.should.to.have.length.above(3);
+    //         let pointsShouldNotCatched = pointsInRange.filter (item => {
+    //             return item.lat > 52.092067 && item.lng < 51.913163 && item.lng < 51.997977 && item.lng > 52.008690;
+    //         });
+    //         pointsShouldNotCatched.should.to.have.length(0);
+    //         done();
+    //     })
+    // });
 });
 
 
@@ -235,7 +253,7 @@ describe ('check is item in range', () => {
 
     let item, basePoint, range;
     before(function() {
-        // this.skip();
+        this.skip();
         item = {
             lat: 40,
             lng: 40,
@@ -287,7 +305,9 @@ describe ('check is item in range', () => {
         done();
     });
 
+
 });
+
 
 
 

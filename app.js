@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const item = require('./item');
+const itemUtils = require('./item-utils');
 const app = express();
 
 app.use(bodyParser.json()); 
@@ -12,7 +12,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/create/item', (req, res) => {
-    item.create(req.body)
+    itemUtils.create(req.body)
     .then( item => {
         res.send(item);
     })
@@ -25,7 +25,7 @@ app.post('/create/item', (req, res) => {
 });
 
 app.get('/get/items', (req, res) => {
-    item.get({
+    itemUtils.get({
         lat: Number(req.query.lat),
         lng: Number(req.query.lng),
     })
@@ -42,7 +42,7 @@ app.get('/get/items', (req, res) => {
 });
 
 app.get('/get/item', (req, res) => {
-    item.getByID(req.query.id)
+    itemUtils.getByID(req.query.id)
     .then( items => {
         res.send(items);
     })
@@ -55,12 +55,21 @@ app.get('/get/item', (req, res) => {
 });
 
 
-app.get('/get/items/square', (req, res) => {
-    item.getInSquareRange({
-        lat: Number(req.query.lat),
-        lng: Number(req.query.lng),
-        range: Number(req.query.range)
+app.post('/get/items/rectangle', (req, res) => {
+    itemUtils.getInRectangle(req.body)
+    .then( items => {
+        res.send(items);
     })
+    .catch( error => {
+        res.send({
+            status: 'Error',
+            message: error
+        });
+    })
+});
+
+app.post('/get/items/polygon', (req, res) => {
+    itemUtils.getInPolygon(req.body)
     .then( items => {
         res.send(items);
     })
@@ -73,7 +82,7 @@ app.get('/get/items/square', (req, res) => {
 });
 
 app.get('/get/items/circle', (req, res) => {
-    item.getInCircleRadius({
+    itemUtils.getInCircleRadius({
         lat: Number(req.query.lat),
         lng: Number(req.query.lng),
         radius: Number(req.query.radius),
@@ -89,12 +98,12 @@ app.get('/get/items/circle', (req, res) => {
     })
 });
 
-app.get('/check/item/square', (req, res) => {
-    item.getInSquareRange({
-        _id: req.query.id,
+app.get('/check/item/rectangle', (req, res) => {
+    itemUtils.isInSquareRange({
+        id: req.query.id,
         lat: Number(req.query.lat),
         lng: Number(req.query.lng),
-        range: Number(req.query.range)
+        range: Number(req.query.range),
     })
     .then( items => {
         res.send(items);

@@ -1,3 +1,6 @@
+const lodash = require('lodash');
+const geolib = require('geolib');
+
 const utils = {
     getRandomLatLng: () => {
         return {
@@ -8,7 +11,7 @@ const utils = {
     
     // Haversine formula returns distance in kilometer
     // https://stackoverflow.com/a/27943/3650479
-    getHaversineDistance: (point1, point2) => {
+    getHaversineDistance: (point1, point2, round) => {
         var R = 6371;
         var dLat = utils.degreeToRadian(point2.lat-point1.lat); 
         var dLng = utils.degreeToRadian(point2.lng-point1.lng); 
@@ -17,30 +20,71 @@ const utils = {
           Math.cos(utils.degreeToRadian(point1.lat)) * Math.cos(utils.degreeToRadian(point2.lat)) * 
           Math.sin(dLng/2) * Math.sin(dLng/2); 
         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-        var d = R * c;
-        return d;
+        var distance = R * c * 1000;
+        if (round){
+            return lodash.round(distance, round);
+        }
+        return distance;
+    },
+
+    // https://www.npmjs.com/package/geolib
+    // https://github.com/manuelbieh/Geolib/blob/master/src/geolib.js
+    getGeolibDistanceSimple: (point1, point2, round) => {
+        const distance = geolib.getDistanceSimple(
+            {latitude:point1.lat, longitude:point1.lng},
+            {latitude:point2.lat, longitude:point2.lng}
+        )
+        if (round){
+            return lodash.round(distance, round);
+        }
+    },
+
+    getGeolibDistance: (point1, point2, round) => {
+        const distance = geolib.getDistance(
+            {latitude:point1.lat, longitude:point1.lng},
+            {latitude:point2.lat, longitude:point2.lng}
+        )
+        if (round){
+            return lodash.round(distance, round);
+        }
     },
 
     degreeToRadian: deg => {
         return deg * (Math.PI/180)
     },
 
-    isInRange: (origin, range, point) => {
-        return utils.getHaversineDistance(origin, point) < range;
+    isInCircle: (origin, radious, point) => {
+        return utils.getHaversineDistance(origin, point, 1) < radious;
     },
 
-    getSquareCoordinates: ({lat, lng}, range) => {
-        const oneLongitueInKm = utils.getHaversineDistance({lat:lat, lng:1}, {lat:lat, lng:0});
-        const rangeInLongitude = range / oneLongitueInKm;
-        const x1 = lng - rangeInLongitude;
-        const x2 = lng + rangeInLongitude;
+    isInPolygon: (point, rectangle) => {
+        return geolib.isPointInside(
+            {
+                latitude: point.lat,
+                longitude: point.lng
+            },
+            [
+                { latitude: rectangle[0].lat, longitude: rectangle[0].lng},
+                { latitude: rectangle[1].lat, longitude: rectangle[1].lng},
+                { latitude: rectangle[2].lat, longitude: rectangle[2].lng},
+                { latitude: rectangle[3].lat, longitude: rectangle[3].lng}
+            ]
+        )
+    },
 
-        const oneLatitudeInKm = 111;
-        const rangeInLatitude = range / oneLatitudeInKm;
-        const y1 = lat + rangeInLatitude;
-        const y2 = lat - rangeInLatitude;
-
-        return([{lat: y1, lng: x1}, {lat: y2, lng: x2}]);
+    // we need this function to limit db search area
+    // we have 4 point polygon, we are converting it to 2 point bigger rectangle
+    // because limiting area with polygon requires 
+    getOuterRectangleFromPolygon: polygon => {
+        const p1 = {
+            lat: polygon[0].lat > polygon[1].lat ? polygon[0].lat : polygon[1].lat,
+            lng: polygon[0].lng < polygon[3].lng ? polygon[0].lng : polygon[3].lng
+        }
+        const p2 = {
+            lat: polygon[2].lat < polygon[3].lat ? polygon[2].lat : polygon[3].lat,
+            lng: polygon[1].lng > polygon[1].lng ? polygon[2].lng : polygon[1].lng
+        }
+        return [p1, p2];
     }
 }
 

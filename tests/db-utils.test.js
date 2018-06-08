@@ -5,7 +5,7 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const should = chai.should();
-const dbutil = require('./../dbutil');
+const dbUtils = require('./../db-utils');
 chai.use(chaiHttp); 
 
 describe ('status', () => {
@@ -15,9 +15,9 @@ describe ('status', () => {
     });
 
     it ('should have minimum open connection', (done) => {
-        dbutil.connect()
+        dbUtils.connect()
         .then( db => {
-            const status = dbutil.status(db);
+            const status = dbUtils.status(db);
             return status;
         })
         .then ( status => {
