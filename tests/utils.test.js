@@ -47,20 +47,21 @@ describe ('check point is inside', () => {
         isInCircle.should.be.false;
     });
 
-    it ('should check given point is in polygon', () => {
-        const origin = {lat:41, lng:-107};
-        const polygon = [
-            {lat: 41.003436, lng:-107.003888}, 
-            {lat: 41.001266, lng:-106.996435}, 
-            {lat: 40.999101, lng:-106.998680},
-            {lat: 40.999482, lng:-107.001792}
-        ];
-        const point = {lat:41, lng:-100};
-        const isInPolygon = utils.isInPolygon(origin, polygon);
-        isInPolygon.should.be.true;
+    it ('should check given point in given rectangle', () => {
+        const point = {lat:41, lng:-107};
+        const rectangle = [{lat:41.1, lng:-107.1},{lat:40.9, lng:-106.9} ];
+        const isInCircle = utils.isInRectangle(rectangle, point);
+        isInCircle.should.be.true;
     });
 
-    it ('should get outer rectangle', () => {
+    it ('should check given point not in given rectangle', () => {
+        const point = {lat:41, lng:-107};
+        const rectangle = [{lat:40, lng:-107.1},{lat:40.9, lng:-106.9} ];
+        const isInCircle = utils.isInRectangle(rectangle, point);
+        isInCircle.should.be.false;
+    });
+
+    it ('should get outer rectangle from polygon', () => {
         const polygon = [
             { lat: 7, lng: 1},
             { lat: 6, lng: 8},
@@ -75,8 +76,23 @@ describe ('check point is inside', () => {
         rectangle.should.deep.include(result[0]);
         rectangle.should.deep.include(result[1]);
     });
+
+    it ('should get outer rectangle from circle', () => {
+        const circle = { lat: 4, lng: 5};
+        const radious = 5000;
+        const rectangle = utils.getRectangleOffset(circle, radious);
+        const distance1 = utils.getHaversineDistance(circle,  { lat: rectangle[0].lat, lng: circle.lng });
+        const distance2 = utils.getHaversineDistance(circle,  { lat: rectangle[1].lat, lng: circle.lng });
+        const distance3 = utils.getHaversineDistance(circle,  { lat: circle.lat, lng: rectangle[0].lng });
+        const distance4 = utils.getHaversineDistance(circle,  { lat: circle.lat, lng: rectangle[1].lng });
+        distance1.should.not.lessThan(radious);
+        distance2.should.not.lessThan(radious);
+        distance3.should.not.lessThan(radious);
+        distance4.should.not.lessThan(radious);
+    });
     
 });
+
 
 describe ('distance calculations', () => {
 
@@ -146,8 +162,8 @@ describe ('distance calculations', () => {
         (distance+2000).should.be.greaterThan(geolib);
     });
 
-    
 
+    
 
 });
 

@@ -25,11 +25,7 @@ app.post('/create/item', (req, res) => {
 });
 
 app.get('/get/items', (req, res) => {
-    itemUtils.get({
-        lat: Number(req.query.lat),
-        lng: Number(req.query.lng),
-    })
-
+    itemUtils.get(req.query)
     .then( items => {
         res.send(items);
     })
@@ -68,8 +64,8 @@ app.post('/get/items/rectangle', (req, res) => {
     })
 });
 
-app.post('/get/items/polygon', (req, res) => {
-    itemUtils.getInPolygon(req.body)
+app.post('/get/items/circle', (req, res) => {
+    itemUtils.getInCircleRadius(req.body)
     .then( items => {
         res.send(items);
     })
@@ -81,30 +77,21 @@ app.post('/get/items/polygon', (req, res) => {
     })
 });
 
-app.get('/get/items/circle', (req, res) => {
-    itemUtils.getInCircleRadius({
-        lat: Number(req.query.lat),
-        lng: Number(req.query.lng),
-        radius: Number(req.query.radius),
-    })
-    .then( items => {
-        res.send(items);
+app.post('/check/item/circle', (req, res) => {
+    itemUtils.isInCircleRadius(req.body)
+    .then( result => {
+        res.send(result);
     })
     .catch( error => {
         res.send({
             status: 'Error',
             message: error
-        });
+        })
     })
 });
 
-app.get('/check/item/rectangle', (req, res) => {
-    itemUtils.isInSquareRange({
-        id: req.query.id,
-        lat: Number(req.query.lat),
-        lng: Number(req.query.lng),
-        range: Number(req.query.range),
-    })
+app.post('/check/item/rectangle', (req, res) => {
+    itemUtils.isInRectangle(req.body)
     .then( items => {
         res.send(items);
     })

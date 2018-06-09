@@ -27,6 +27,17 @@ const utils = {
         return distance;
     },
 
+    //returns rectangle based on center point and distance
+    getRectangleOffset: (center, distance) => {
+        const distanceOfOneDegreeLat = utils.getHaversineDistance(center, { lat: center.lat + 1, lng:center.lng});
+        const latOffset = distance / distanceOfOneDegreeLat;
+        const distanceOfOneDegreeLng = utils.getHaversineDistance(center, { lat: center.lat, lng:center.lng + 1});
+        const lngOffset = distance / distanceOfOneDegreeLng;
+        const point1 = {lat: center.lat + latOffset, lng: center.lng - lngOffset}
+        const point2 = {lat: center.lat - latOffset, lng: center.lng + lngOffset}
+        return [point1, point2];
+    },
+
     // https://www.npmjs.com/package/geolib
     // https://github.com/manuelbieh/Geolib/blob/master/src/geolib.js
     getGeolibDistanceSimple: (point1, point2, round) => {
@@ -57,18 +68,12 @@ const utils = {
         return utils.getHaversineDistance(origin, point, 1) < radious;
     },
 
-    isInPolygon: (point, rectangle) => {
-        return geolib.isPointInside(
-            {
-                latitude: point.lat,
-                longitude: point.lng
-            },
-            [
-                { latitude: rectangle[0].lat, longitude: rectangle[0].lng},
-                { latitude: rectangle[1].lat, longitude: rectangle[1].lng},
-                { latitude: rectangle[2].lat, longitude: rectangle[2].lng},
-                { latitude: rectangle[3].lat, longitude: rectangle[3].lng}
-            ]
+    isInRectangle: (rectangle, point) => {
+        return (
+            rectangle[0].lat >= point.lat
+            && rectangle[0].lng <= point.lng
+            && rectangle[1].lat <= point.lat
+            && rectangle[1].lng >= point.lng
         )
     },
 

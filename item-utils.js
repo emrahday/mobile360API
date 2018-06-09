@@ -17,6 +17,19 @@ const itemUtils = {
             });
         });
     },
+    createBulk : items => {
+        return new Promise( (resolve, reject) => {
+            dbUtils.connect()
+            .then(db => {
+                db.collection(config.mongo.collections.items).insert(items, (err, result) => {
+                    if (err){
+                        reject(err);
+                    }
+                    resolve(result.ops);
+                });
+            });
+        });
+    },
     get: query => {
         return new Promise( (resolve, reject) => {
             dbUtils.connect()
@@ -58,25 +71,14 @@ const itemUtils = {
             });
         });
     },
-    getInPolygon: (query) => {
-        const items = [];
-        return new Promise ( (resolve, reject) => {
-            const rectangleQuery = utils.getOuterRectangleFromPolygon(query);
-            itemUtils.getInRectangle(rectangleQuery)
-            .then( recItems => {
-                recItems.forEach( item => {
-                    if ( utils.isInPolygon(item, query) ){
-                        items.push(item);
-                    }
-                })
-                resolve(items);
-            });
-        });
-    },
 
     getInCircleRadius:  (query) => {
         return new Promise ( (resolve, reject) => {
-            item.getInSquareRange({lat:query.lat, lng:query.lng, range:query.radius})
+            const rectangle = utils.getRectangleOffset({lat: query.lat, lng: query.lng}, query.radius);
+            itemUtils.getInRectangle([
+                {lat:rectangle[0].lat, lng:rectangle[0].lng},
+                {lat:rectangle[1].lat, lng:rectangle[1].lng}
+            ])
             .then ( items => {
                 let filteredItems = items.filter( item => {
                     let distance = utils.getHaversineDistance(
@@ -91,12 +93,51 @@ const itemUtils = {
     },
 
 
-    isInSquareRange: ({id, lat, lng, range}) => {
-        return new Promise ( (resolve, reject) => {
-            let itemToCheck = item.getByID(id);
-            resolve(true);
+    isInCircleRadius: (query) => {
+        return new Promise ( (resolve, reject) => { 
+            itemUtils.getByID(query._id)
+            .then ( items => {
+                if (items && items.length > 0){
+                    const distance = utils.getHaversineDistance(
+                        {lat:query.point.lat, lng:query.point.lng},
+                        {lat:items[0].lat, lng:items[0].lng}
+                    )
+                    query.inCircle = distance <= query.radius;
+                    query.distance = distance;
+                    resolve(query);
+                } else {
+                    reject({
+                        status: 'Error',
+                        message: 'Item not found'
+                    });
+                }
+            });
+        });
+    },
+
+    isInRectangle: (query) => {
+        return new Promise ( (resolve, reject) => { 
+            itemUtils.getByID(query._id)
+            .then ( items => {
+                if (items && items.length > 0){
+                    const inRectangle = utils.isInRectangle(
+                        query.points,
+                        {lat:items[0].lat, lng:items[0].lng}
+                    )
+                    query.inRectangle = inRectangle;
+                    resolve(query);
+                } else {
+                    reject({
+                        status: 'Error',
+                        message: 'Item not found'
+                    });
+                }
+            });
         });
     }
+
+
+
 
 }
 

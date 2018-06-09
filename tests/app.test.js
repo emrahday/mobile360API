@@ -17,7 +17,6 @@ describe ('init', () => {
 
     before(function() {
         // this.skip();
-
         dbUtils.drop(); // stateless test: clean db before test
     });
 
@@ -38,9 +37,10 @@ describe ('create and get items', () => {
     let latLng;
     let _id;
     before(function() {
-        this.skip();
+        // this.skip();
         latLng = utils.getRandomLatLng();
     });
+
     it ('should create an item and return', (done) => {
         chai.request(app)
         .post('/create/item')
@@ -54,6 +54,20 @@ describe ('create and get items', () => {
             _id = item._id;
             item.lat.should.equal(latLng.lat);
             item.lat.should.equal(latLng.lat);
+            done();
+        })
+    });
+
+    it ('should create multiple item and return', (done) => {
+        chai.request(app)
+        .post('/create/items')
+        .send(latLng)
+        .end((err, {status, type, body:item}) => {
+            should.not.exist(err);
+            status.should.equal(200);
+            type.should.equal('application/json');
+            item[0].should.include.keys('lat', 'lng', '_id');
+            
             done();
         })
     });
@@ -93,7 +107,7 @@ describe ('create and get items', () => {
 describe ('custom property check', () => {
     let item;
     before(function() {
-        this.skip();
+        // this.skip();
         item = {
             lat: 30,
             lng: 30,
@@ -141,12 +155,13 @@ describe ('custom property check', () => {
 
 describe ('get items in area', () => {
 
-    let rectangle, polygon; 
+    let rectangle, polygon, circle, radius; 
     let items;
 
-    before(function(done) {
+    before( async () => {
         // this.skip();
-
+        circle = { lat: 4, lng: 5};
+        radius = 500000;
         rectangle = [
             { lat: 7, lng: 1},
             { lat: 1, lng: 8},
@@ -158,38 +173,26 @@ describe ('get items in area', () => {
             { lat: 2, lng: 2},
         ]
         items = [
-            { lat: 7, lng: 1},          //[0] in rectangle, in polygon
-            { lat: 1, lng: 8},          //[1]  in rectangle, not in polygon
-            { lat: 2, lng: 2},          //[2]  in rectangle, in polygon
-            { lat: 4, lng: 5},          //[3]  in rectangle, in polygon
-            { lat: 1, lng: 1},          //[4]  in rectangle, not in polygon
-            { lat: 3, lng: 1.1},        //[5]  in rectangle, not in polygon
-            { lat: 6, lng: 1.1},        //[6]  in rectangle, in polygon
-            { lat: 1.1, lng: 1},        //[7]  in rectangle, in polygon
-            { lat: 1.1, lng: 6},        //[8]  in rectangle, polygon
-            { lat: 8, lng: 5},          //[9]  not in
-            { lat: 0.5, lng: 3},        //[10]  not in
-            { lat: 6, lng: 9},          //[11]  not in
-            { lat: 7.000001, lng: 1},   //[12]  not in
+            { lat: 7, lng: 1},          //[0]  in rectangle, in polygon distance:554295.67
+            { lat: 1, lng: 8},          //[1]  in rectangle, not in polygon distance: 471508.55
+            { lat: 2, lng: 2},          //[2]  in rectangle, in polygon distance: 400524.43
+            { lat: 4, lng: 5},          //[3]  in rectangle, in polygon distance: 0
+            { lat: 1, lng: 1},          //[4]  in rectangle, not in polygon distance: 555595.06
+            { lat: 3, lng: 1.1},        //[5]  in rectangle, not in polygon distance: 446899.9
+            { lat: 6, lng: 1.1},        //[6]  in rectangle, in polygon distance: 485870.31
+            { lat: 1.1, lng: 1},        //[7]  in rectangle, in polygon distance: 548979.68
+            { lat: 1.1, lng: 6},        //[8]  in rectangle, polygon distance: 341058.72
+            { lat: 8, lng: 5},          //[9]  not in distance: 444779.71
+            { lat: 0.5, lng: 3},        //[10]  not in distance: 448138.82
+            { lat: 6, lng: 9},          //[11]  not in distance: 495744.39
+            { lat: 7.000001, lng: 1},   //[12]  not in 554295.74
         ]
 
-        //create items
-        items.forEach ( (element, index) => {
-            itemUtils.create(element)
-            .then ( item => {
-                item.should.include.keys('lat', 'lng', '_id');
-                item._id.should.not.equal(null);
-                item.lat.should.equal(element.lat);
-                item.lat.should.equal(element.lat);
-                items[index]._id = item._id.toString();
-            });
-        });
-        setTimeout(() => { // TODO fix this timeout issue
-            done();
-        }, 1000);
+        items = await itemUtils.createBulk(items);
         //TODO check also NW, SW, SE
         //TODO check if item has not lat, lng property
     });
+
 
     it ('should return items in rectangle', (done) => {
         chai.request(app)
@@ -199,111 +202,144 @@ describe ('get items in area', () => {
             should.not.exist(err);
             status.should.equal(200);
             type.should.equal('application/json');
-            rectangleItems.should.to.have.length.above(8);
-            rectangleItems.should.deep.include(items[0]);
-            rectangleItems.should.deep.include(items[1]);
-            rectangleItems.should.deep.include(items[2]);
-            rectangleItems.should.deep.include(items[3]);
-            rectangleItems.should.deep.include(items[4]);
-            rectangleItems.should.deep.include(items[5]);
-            rectangleItems.should.deep.include(items[6]);
-            rectangleItems.should.deep.include(items[7]);
-            rectangleItems.should.deep.include(items[8]);
-            rectangleItems.should.not.deep.include(items[9]);
-            rectangleItems.should.not.deep.include(items[10]);
-            rectangleItems.should.not.deep.include(items[11]);
+            rectangleItems.should.to.have.length(9);
+            //TODO check each item
             done();
         });
     });
 
-    it ('should return items in polygon', (done) => {
+    it ('should return items in circle', (done) => {
         chai.request(app)
-        .post(`/get/items/polygon`)
-        .send(polygon)
-        .end((err, {status, type, body:polygonItems }) =>{
+        .post(`/get/items/circle`)
+        .send({
+            lat: circle.lat,
+            lng: circle.lng,
+            radius: radius
+        })
+        .end((err, {status, type, body:circleItems }) =>{
             should.not.exist(err);
             status.should.equal(200);
             type.should.equal('application/json');
-            // polygonItems.should.to.have.length.above(3);
-
-            polygonItems.should.deep.include(items[0]);
+            circleItems.should.to.have.length(9);
+            //TODO check each item
             done();
-        })
+        });
     });
-
-    // it ('should return items in circle', (done) => {
-    //     chai.request(app)
-    //     .get(`/get/items/circle?lat=${basePoint.lat}&lng=${basePoint.lng}&radius=${range}`)
-    //     .end((err, {status, type, body:items }) =>{
-    //         should.not.exist(err);
-    //         status.should.equal(200);
-    //         type.should.equal('application/json');
-    //         items.should.to.have.length.above(3);
-    //         let pointsShouldNotCatched = pointsInRange.filter (item => {
-    //             return item.lat > 52.092067 && item.lng < 51.913163 && item.lng < 51.997977 && item.lng > 52.008690;
-    //         });
-    //         pointsShouldNotCatched.should.to.have.length(0);
-    //         done();
-    //     })
-    // });
 });
 
 
 describe ('check is item in range', () => {
 
-    let item, basePoint, range;
-    before(function() {
-        this.skip();
-        item = {
-            lat: 40,
-            lng: 40,
-            name: 'sample name',
-            phone: '123456789',
-            address: 'sample address'
-        }
-        range = 200;
-        basePoint = {lat:41, lng:41};
+    let center, itemIn, radius;
+    before( async () => {
+        // this.skip();
+        itemIn = {lat:41, lng:41};
+        itemOut = {lat:41.0025, lng:41.0025};
+        radius = 140000;
+
+        const result = await itemUtils.createBulk([itemIn, itemOut])
+        result[0].should.include.keys('lat', 'lng', '_id');
+        result[0]._id.should.not.be.empty;
+        result[0].lat.should.equal(itemIn.lat);
+        result[0].lat.should.equal(itemIn.lat);
+        itemIn._id = result[0]._id.toString();
+        result[1].should.include.keys('lat', 'lng', '_id');
+        result[1]._id.should.not.be.empty;
+        result[1].lat.should.equal(itemOut.lat);
+        result[1].lat.should.equal(itemOut.lat);
+        itemOut._id = result[1]._id.toString();
     });
 
-    it ('should create item', (done) => {
+    it ('should be in circle', (done) => {
+        const data = {
+            _id: itemIn._id,
+            point: { lat: 40, lng: 40 },
+            radius: radius
+        };
         chai.request(app)
-        .post('/create/item')
-        .send(item)
-        .end((err, {status, type, body:result}) => {
+        .post('/check/item/circle')
+        .send(data)
+        .end((err, {status, type, body:result }) =>{
             should.not.exist(err);
             status.should.equal(200);
             type.should.equal('application/json');
-            result.should.include.keys('lat', 'lng', '_id');
-            result._id.should.not.equal(null);
-            result.lat.should.equal(item.lat);
-            result.lat.should.equal(item.lat);
-            item._id = result._id;
+            result.should.not.be.empty;
+            result._id.should.be.equal(data._id);
+            result.point.lat.should.be.equal(data.point.lat);
+            result.point.lng.should.be.equal(data.point.lng);
+            result.inCircle.should.be.true;
             done();
         });
     });
 
-    it ('should be in square range', (done) => {
+    it ('should not be in circle', (done) => {
+        const data = {
+            _id: itemOut._id,
+            point: { lat: 40, lng: 40 },
+            radius: radius
+        };
         chai.request(app)
-        .get(`/check/item/square?id=${item._id}&lat=${basePoint.lat}&lng=${basePoint.lng}&range=${range}`)
-        .end((err, {status, type, body:items }) =>{
+        .post('/check/item/circle')
+        .send(data)
+        .end((err, {status, type, body:result }) =>{
             should.not.exist(err);
             status.should.equal(200);
             type.should.equal('application/json');
+            result.should.not.be.empty;
+            result._id.should.be.equal(data._id);
+            result.point.lat.should.be.equal(data.point.lat);
+            result.point.lng.should.be.equal(data.point.lng);
+            result.inCircle.should.be.false;
             done();
-        })
+        });
     });
 
-    it ('should NOT be in square range', (done) => {
-        done();
+    it ('should be in rectangle', (done) => {
+        const data = {
+            _id: itemIn._id,
+            points: [{lat:42, lng:40},{lat:40, lng:42}]
+        };
+        chai.request(app)
+        .post('/check/item/rectangle')
+        .send(data)
+        .end((err, {status, type, body:result }) =>{
+            should.not.exist(err);
+            status.should.equal(200);
+            type.should.equal('application/json');
+            result.should.not.be.empty;
+            result._id.should.be.equal(data._id);
+            result.points[0].lat.should.be.equal(data.points[0].lat);
+            result.points[0].lng.should.be.equal(data.points[0].lng);
+            result.points[1].lat.should.be.equal(data.points[1].lat);
+            result.points[1].lng.should.be.equal(data.points[1].lng);
+            result.inRectangle.should.be.true;
+            done();
+        });
     });
 
-    it ('should be in circle range', (done) => {
-        done();
+    it ('should not e in rectangle', (done) => {
+        const data = {
+            _id: itemIn._id,
+            points: [{lat:39.99999, lng:40},{lat:40, lng:42}]
+        };
+        chai.request(app)
+        .post('/check/item/rectangle')
+        .send(data)
+        .end((err, {status, type, body:result }) =>{
+            should.not.exist(err);
+            status.should.equal(200);
+            type.should.equal('application/json');
+            result.should.not.be.empty;
+            result._id.should.be.equal(data._id);
+            result.points[0].lat.should.be.equal(data.points[0].lat);
+            result.points[0].lng.should.be.equal(data.points[0].lng);
+            result.points[1].lat.should.be.equal(data.points[1].lat);
+            result.points[1].lng.should.be.equal(data.points[1].lng);
+            result.inRectangle.should.be.false;
+            done();
+        });
     });
 
-    it ('should NOT be in circle range', (done) => {
-        done();
-    });
 
 
 });
