@@ -24,8 +24,21 @@ app.post('/create/item', (req, res) => {
     });
 });
 
-app.get('/get/items', (req, res) => {
-    itemUtils.get(req.query)
+app.post('/create/items', (req, res) => {
+    itemUtils.createBulk(req.body)
+    .then( items => {
+        res.send(items);
+    })
+    .catch( error => {
+        res.send({
+            status: 'Error',
+            message: error
+        })
+    });
+});
+
+app.post('/get/items', (req, res) => {
+    itemUtils.get(req.body)
     .then( items => {
         res.send(items);
     })

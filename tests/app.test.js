@@ -58,23 +58,25 @@ describe ('create and get items', () => {
         })
     });
 
-    it ('should create multiple item and return', (done) => {
+    it ('should create multiple items and return', (done) => {
         chai.request(app)
         .post('/create/items')
-        .send(latLng)
-        .end((err, {status, type, body:item}) => {
+        .send([{lat:1, lng:1},{lat:2, lng:2}])
+        .end((err, {status, type, body:items}) => {
             should.not.exist(err);
             status.should.equal(200);
             type.should.equal('application/json');
-            item[0].should.include.keys('lat', 'lng', '_id');
-            
+            items[0].should.include.keys('lat', 'lng', '_id');
+            items[1].should.include.keys('lat', 'lng', '_id');
             done();
         })
     });
 
     it ('should return items by lat/lng', (done) => {
+        // we are using post because minus lat/lng goes as string, but we need number
         chai.request(app)
-        .get(`/get/items?lat=${latLng.lat}&lng=${latLng.lng}`)
+        .post(`/get/items`)
+        .send(latLng)
         .end((err, {status, type, body:items }) =>{
             should.not.exist(err);
             status.should.equal(200);
@@ -88,6 +90,7 @@ describe ('create and get items', () => {
             done();
         })
     });
+
 
     it ('should return item by id', done => {
         chai.request(app)
@@ -160,6 +163,7 @@ describe ('get items in area', () => {
 
     before( async () => {
         // this.skip();
+        dbUtils.drop(); // stateless test: clean db before test
         circle = { lat: 4, lng: 5};
         radius = 500000;
         rectangle = [
@@ -317,6 +321,7 @@ describe ('check is item in range', () => {
         });
     });
 
+
     it ('should not e in rectangle', (done) => {
         const data = {
             _id: itemIn._id,
@@ -340,12 +345,7 @@ describe ('check is item in range', () => {
         });
     });
 
-
-
 });
-
-
-
 
 
 // moveable item stoped in time
