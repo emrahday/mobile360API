@@ -1,4 +1,4 @@
-const {MongoClient, ObjectID} = require('mongodb');
+const {ObjectID} = require('mongodb');
 const dbUtils = require('./db-utils');
 const config = require('./config');
 const utils = require('./utils');
@@ -135,10 +135,6 @@ const itemUtils = {
             });
         });
     }
-
-
-
-
 }
 
 module.exports = itemUtils;

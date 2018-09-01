@@ -20,7 +20,7 @@ describe ('init', () => {
         dbUtils.drop(); // stateless test: clean db before test
     });
 
-    it ('should return status OK', (done) => {
+    it ('should return server status 200 and type application/json', (done) => {
         chai.request(app)
         .get('/')
         .end((err, res) =>{
@@ -41,7 +41,7 @@ describe ('create and get items', () => {
         latLng = utils.getRandomLatLng();
     });
 
-    it ('should create an item and return', (done) => {
+    it ('should create an item and return created item', (done) => {
         chai.request(app)
         .post('/create/item')
         .send(latLng)
@@ -58,7 +58,7 @@ describe ('create and get items', () => {
         })
     });
 
-    it ('should create multiple items and return', (done) => {
+    it ('should create multiple items and return created items', (done) => {
         chai.request(app)
         .post('/create/items')
         .send([{lat:1, lng:1},{lat:2, lng:2}])
@@ -72,7 +72,7 @@ describe ('create and get items', () => {
         })
     });
 
-    it ('should return items by lat/lng', (done) => {
+    it ('should return items by exactly matching lat/lng', (done) => {
         // we are using post because minus lat/lng goes as string, but we need number
         chai.request(app)
         .post(`/get/items`)
@@ -322,7 +322,7 @@ describe ('check is item in range', () => {
     });
 
 
-    it ('should not e in rectangle', (done) => {
+    it ('should not be in rectangle', (done) => {
         const data = {
             _id: itemIn._id,
             points: [{lat:39.99999, lng:40},{lat:40, lng:42}]
@@ -344,18 +344,4 @@ describe ('check is item in range', () => {
             done();
         });
     });
-
 });
-
-
-// moveable item stoped in time
-// moveable item faster
-// moveable item slower
-
-// item connection status since given time period
-// get item actual power status
-// request response from item 
-// is item out of path
-// is item out of schedule
-// is item path rounded
-// is item in emergency
