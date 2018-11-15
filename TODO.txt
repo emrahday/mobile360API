@@ -1,27 +1,41 @@
-// TODO
-// moveable item stoped in time
-// moveable item faster
-// moveable item slower
+ TODO
+ - add nice github readme
+   -- how to run dev environment
+   -- how to run tests
 
-// item connection status since given time period
-// get item actual power status
-// request response from item 
-// is item out of path
-// is item out of schedule
-// is item path rounded
-// is item in emergency
+ - create a nice web interface for development purpose
 
-// for user creation use google authenticator
-// mongo indexing items by id, but not lat-lng. index item by lat/lng
-// implement in memory caching with redis
+ ? do we really need to seperate movable and non-movable items
+ - moveable item stoped in time
+ - moveable item faster
+ - moveable item slower
 
-Tech stack:
+ - item connection status since given time period
+ - get item actual power status
+ - request response from item 
+ - is item out of path
+ - is item out of schedule
+ - is item path rounded
+ - is item in emergency
+
+ - for user creation use google authenticator, may be it is simple
+ - mongo indexing items by id, but not lat-lng. index item by lat/lng
+ - implement in memory caching with redis
+
+ - investigate how to integrate to wix, wordpress etc. 
+  -- for wix create different web component, map, lat/lng input, status input etc. 
+  -- each component should work individually
+  -- each component should pass some guid/hash which contains user idendificator
+
+TECH STACK
 - node.js
 - mongodb
 - aws
-- graphql
 - express
+- redis
+? graphql
 
+MOTIVATION AND ORIENTATION
 - ilk olarak basit bir database tasarla. lat/lng Create/Read
 - bir katman database erisim katmani
 - bir katman business logic
@@ -37,8 +51,8 @@ Tech stack:
 - react native ile konum bilgisi alinabiliyor, background service kaydedilebiliyor. 
 - react icinde bootstrap, material gibi UI kutuphaneleri eklenebiliyor. 
 
-- createMovable
-- createStatic
+- createMovable ( ? do we really need movable and non-moveable seperation)
+- createStatic ( ? do we really need movable and non-moveable seperation)
 - createCase
 - createAction
 - createScenerio
@@ -46,28 +60,56 @@ Tech stack:
 # Senaryolar
 -------------
 
-Senaryo 1. - standart user
-user uygulamaya girer, ekranda bir tane "start by register" butonu olur. bastiginda kullanicidan email adresini ister. start butonu "recording stop" olur. servera lokasyon bilgisini gonderir. sisteme giren diger tum kullanicilar email ile arama yaptiklarinda kullanici lokasyonunu gorurler.
+SENARYO 1. - standart user
+user uygulamaya girer, ekranda bir tane "start by register" butonu olur. 
+bastiginda kullanicidan email adresini ister. start butonu "recording stop" olur. 
+servera lokasyon bilgisini gonderir. sisteme giren diger tum kullanicilar email 
+ile arama yaptiklarinda kullanici lokasyonunu gorurler.
 
-Senaryo 2. - follow user
-user web uygulamaya girer. mail adresi ile diger user arar. follow butonuna basarak kullaniciyi takibe baslar. 
+SENARYO 2. - follow user
+user web uygulamaya girer. mail adresi ile diger user arar. 
+follow butonuna basarak kullaniciyi takibe baslar. 
 
-Senaryo 3. - private user
-user ayarlardan kenini private yapar. diger kullanicilar email ile aradiklarinda kullanicinin lokasyonunu goremezler. gormek icin follow request gonderir. private user requesti kabul eder ve lokasyonu paylasmaya baslar
+SENARYO 3. - private user
+user ayarlardan kenini private yapar. 
+diger kullanicilar email ile aradiklarinda kullanicinin lokasyonunu goremezler. 
+gormek icin follow request gonderir. 
+private user requesti kabul eder ve lokasyonu paylasmaya baslar
 
-Senaryo 4. - grup user
-User 1 grup oluşturur. Grup kodunu telefona girer. Grup kodunu user 2 ye gönderir. User 2 grup kodunu telefona girer. İki user birbirinin konumunu görebilir. 
+SENARYO 4. - grup user
+User 1 grup oluşturur. Grup kodunu telefona girer. 
+Grup kodunu user 2 ye gönderir. 
+User 2 grup kodunu telefona girer. 
+İki user birbirinin konumunu görebilir. 
 
-Senaryo 5. - senaryo olusturma
-User 1 area oluşturur. User 1 senaryo oluşturur. Senaryo "user 2 area ya girerse user 1 e notification gönder" seklinde olur. user 2 alana girince user 1 e notification gider
+SENARYO 5. - senaryo olusturma
+User 1 area oluşturur. User 1 senaryo oluşturur. 
+Senaryo "user 2 area ya girerse user 1 e notification gönder" seklinde olur. 
+user 2 alana girince user 1 e notification gider
 
-Senaryo 6. - cihaz bilgisi
-user 1 pil durumu dusuk konuma gelir. user 2 ekraninda user 1 pil durumunu gorur. user 1 pil biter ve baglanti kopar. user 2 ekraninda user 1 icin en son baglanti zamanini, son baglanti zamanindaki cihaz bilgisi (pil durumu, network durumu) ve konum bilgisini gorur. 
+SENARYO 6. - cihaz bilgisi
+user 1 pil durumu dusuk konuma gelir. 
+user 2 ekraninda user 1 pil durumunu gorur. 
+user 1 pil biter ve baglanti kopar. 
+user 2 ekraninda user 1 icin en son baglanti zamanini, son baglanti zamanindaki 
+cihaz bilgisi (pil durumu, network durumu) ve konum bilgisini gorur. 
 
-Senaryo 7- Multiple app
-kullanici bir app-id olusturur. app-id altinda item olusturur. app-id altinda user olusturur. app-id altinda group olusturur. artik tum crud islemleri app-id filtresi altinda olur yani bir app-id altindaki item, user, group digerini goremez. app-id bir sandbox gorevi gorur. boylece api bircok farkli uygulamaya entegre edilebilir. 
+SENARYO 7- Multiple app
+kullanici bir app-id olusturur. 
+app-id altinda item olusturur. 
+app-id altinda user olusturur. 
+app-id altinda group olusturur. 
+artik tum crud islemleri app-id filtresi altinda olur yani bir app-id altindaki 
+item, user, group digerini goremez. app-id bir sandbox gorevi gorur. 
+boylece api bircok farkli uygulamaya entegre edilebilir. 
 
-Senaryo 8 -  Third party integration. entegrasyon api userinden oldugu gibi iframe html content uzerinden de olabilir. kullanici wix sitesine girer, iframe olusturur. appid ile birlikte belli bir url cagirir, o url iframe genisligine gore responsive html content ve widget doner. arka tarafta app-id ve cagiran url birbirine eslesmelidir. yani bir app-id widget sadece belli bir url den cagirilabilir.  
+SENARYO 8 -  Third party integration. entegrasyon api userinden oldugu gibi 
+iframe html content uzerinden de olabilir. 
+kullanici wix sitesine girer, iframe olusturur. 
+appid ile birlikte belli bir url cagirir, o url iframe genisligine gore 
+responsive html content ve widget doner. 
+arka tarafta app-id ve cagiran url birbirine eslesmelidir. 
+yani bir app-id widget sadece belli bir url den cagirilabilir.  
 
 # Mobil uygulama gelistirmeden nasil yapabilirim?
 -------------------------------------------------

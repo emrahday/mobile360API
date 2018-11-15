@@ -8,7 +8,7 @@ const should = chai.should();
 const dbUtils = require('./../db-utils');
 chai.use(chaiHttp); 
 
-describe ('status', () => {
+describe ('database status', () => {
     
     before(function() {
         this.skip();

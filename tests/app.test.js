@@ -158,7 +158,7 @@ describe ('custom property check', () => {
 
 describe ('get items in area', () => {
 
-    let rectangle, polygon, circle, radius; 
+    let rectangle, circle, radius; 
     let items;
 
     before( async () => {
@@ -192,51 +192,44 @@ describe ('get items in area', () => {
             { lat: 7.000001, lng: 1},   //[12]  not in 554295.74
         ]
 
-        items = await itemUtils.createBulk(items);
+        await itemUtils.createBulk(items);
+
         //TODO check also NW, SW, SE
         //TODO check if item has not lat, lng property
     });
 
 
-    it ('should return items in rectangle', (done) => {
-        chai.request(app)
+
+    it ('should return items in rectangle', async (done) => {
+        const res = await chai.request(app)
         .post(`/get/items/rectangle`)
-        .send(rectangle)
-        .end((err, {status, type, body:rectangleItems }) =>{
-            should.not.exist(err);
-            status.should.equal(200);
-            type.should.equal('application/json');
-            rectangleItems.should.to.have.length(9);
-            //TODO check each item
-            done();
-        });
+        .send(rectangle);
+        should.not.exist(res.err);
+        res.statusCode.should.equal(200);
+        res.type.should.equal('application/json');
+        res.body.should.to.have.length(9);
     });
 
-    it ('should return items in circle', (done) => {
-        chai.request(app)
+    it ('should return items in circle', async () => {
+        const res = await chai.request(app)
         .post(`/get/items/circle`)
         .send({
             lat: circle.lat,
             lng: circle.lng,
             radius: radius
-        })
-        .end((err, {status, type, body:circleItems }) =>{
-            should.not.exist(err);
-            status.should.equal(200);
-            type.should.equal('application/json');
-            circleItems.should.to.have.length(9);
-            //TODO check each item
-            done();
-        });
+        }); 
+        should.not.exist(res.err);
+        res.statusCode.should.equal(200);
+        res.type.should.equal('application/json');
+        res.body.should.to.have.length(9);
     });
 });
 
-
-describe ('check is item in range', () => {
+xdescribe ('check is item in range', () => {
 
     let center, itemIn, radius;
     before( async () => {
-        // this.skip();
+        this.skip();
         itemIn = {lat:41, lng:41};
         itemOut = {lat:41.0025, lng:41.0025};
         radius = 140000;
@@ -253,6 +246,7 @@ describe ('check is item in range', () => {
         result[1].lat.should.equal(itemOut.lat);
         itemOut._id = result[1]._id.toString();
     });
+
 
     it ('should be in circle', (done) => {
         const data = {

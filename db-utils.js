@@ -1,5 +1,3 @@
-// in order to run mongo db mongod.exe --dbpath /users/Emrah/mongo_data
-
 const {MongoClient} = require('mongodb');
 const config = require('./config');
 
@@ -13,7 +11,7 @@ const dbUtils = {
                 const db = client.db(config.mongo.dbName);
                 resolve(db);
             });
-        });use 
+        });
     },
     status: db => {
         return new Promise( (resolve, reject) => {

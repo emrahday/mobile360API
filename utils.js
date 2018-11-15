@@ -13,29 +13,18 @@ const utils = {
     // https://stackoverflow.com/a/27943/3650479
     getHaversineDistance: (point1, point2, round) => {
         var R = 6371;
-        var dLat = utils.degreeToRadian(point2.lat-point1.lat); 
-        var dLng = utils.degreeToRadian(point2.lng-point1.lng); 
+        var latRadian = utils.degreeToRadian(point2.lat-point1.lat); 
+        var lngRadian = utils.degreeToRadian(point2.lng-point1.lng); 
         var a = 
-          Math.sin(dLat/2) * Math.sin(dLat/2) +
+          Math.sin(latRadian/2) * Math.sin(latRadian/2) +
           Math.cos(utils.degreeToRadian(point1.lat)) * Math.cos(utils.degreeToRadian(point2.lat)) * 
-          Math.sin(dLng/2) * Math.sin(dLng/2); 
+          Math.sin(lngRadian/2) * Math.sin(lngRadian/2); 
         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
         var distance = R * c * 1000;
         if (round){
             return lodash.round(distance, round);
         }
         return distance;
-    },
-
-    //returns rectangle based on center point and distance
-    getRectangleOffset: (center, distance) => {
-        const distanceOfOneDegreeLat = utils.getHaversineDistance(center, { lat: center.lat + 1, lng:center.lng});
-        const latOffset = distance / distanceOfOneDegreeLat;
-        const distanceOfOneDegreeLng = utils.getHaversineDistance(center, { lat: center.lat, lng:center.lng + 1});
-        const lngOffset = distance / distanceOfOneDegreeLng;
-        const point1 = {lat: center.lat + latOffset, lng: center.lng - lngOffset}
-        const point2 = {lat: center.lat - latOffset, lng: center.lng + lngOffset}
-        return [point1, point2];
     },
 
     // https://www.npmjs.com/package/geolib
@@ -58,6 +47,17 @@ const utils = {
         if (round){
             return lodash.round(distance, round);
         }
+    },
+
+    //returns rectangle based on center point and distance
+    getRectangleOffset: (center, distance) => {
+        const distanceOfOneDegreeLat = utils.getHaversineDistance(center, { lat: center.lat + 1, lng:center.lng});
+        const latOffset = distance / distanceOfOneDegreeLat;
+        const distanceOfOneDegreeLng = utils.getHaversineDistance(center, { lat: center.lat, lng:center.lng + 1});
+        const lngOffset = distance / distanceOfOneDegreeLng;
+        const point1 = {lat: center.lat + latOffset, lng: center.lng - lngOffset}
+        const point2 = {lat: center.lat - latOffset, lng: center.lng + lngOffset}
+        return [point1, point2];
     },
 
     degreeToRadian: deg => {
