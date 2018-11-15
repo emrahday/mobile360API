@@ -6,6 +6,7 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const should = chai.should();
 const dbUtils = require('./../db-utils');
+const config = require('./../config.js');
 chai.use(chaiHttp); 
 
 describe ('database status', () => {
@@ -15,6 +16,10 @@ describe ('database status', () => {
     });
 
     it ('should have minimum open connection', (done) => {
+        // executeDBAdminCommand is not supported by mongo-mock so skipped for dev environment
+        if (config.environment !== 'dev'){ 
+            this.skip();
+        }
         dbUtils.connect()
         .then( db => {
             const status = dbUtils.status(db);
