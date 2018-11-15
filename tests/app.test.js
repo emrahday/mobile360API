@@ -7,7 +7,6 @@ const chaiHttp = require('chai-http');
 const should = chai.should();
 const app = require('./../app');
 const utils = require('./../utils');
-const dbUtils = require('./../db-utils');
 const itemUtils = require('./../item-utils');
 
 chai.use(chaiHttp); 
@@ -17,7 +16,6 @@ describe ('init', () => {
 
     before(function() {
         // this.skip();
-        dbUtils.drop(); // stateless test: clean db before test
     });
 
     it ('should return server status 200 and type application/json', (done) => {
@@ -51,6 +49,7 @@ describe ('create and get items', () => {
             type.should.equal('application/json');
             item.should.include.keys('lat', 'lng', '_id');
             item._id.should.not.equal(null);
+            console.log("ITEM", item)
             _id = item._id;
             item.lat.should.equal(latLng.lat);
             item.lat.should.equal(latLng.lat);
@@ -99,6 +98,8 @@ describe ('create and get items', () => {
            should.not.exist(err);
            status.should.equal(200);
            type.should.equal('application/json');
+
+           console.log("items",items)
            items.should.be.an('array');
            items[0]._id.should.not.be.empty;
            items[0]._id.should.be.equal(_id);
@@ -163,7 +164,6 @@ describe ('get items in area', () => {
 
     before( async () => {
         // this.skip();
-        dbUtils.drop(); // stateless test: clean db before test
         circle = { lat: 4, lng: 5};
         radius = 500000;
         rectangle = [
@@ -198,9 +198,7 @@ describe ('get items in area', () => {
         //TODO check if item has not lat, lng property
     });
 
-
-
-    it ('should return items in rectangle', async (done) => {
+    it ('should return items in rectangle', async () => {
         const res = await chai.request(app)
         .post(`/get/items/rectangle`)
         .send(rectangle);

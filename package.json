@@ -14,11 +14,12 @@
   "author": "Emrah Dayioglu (contact@emrahdayioglu.com)",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.3",
-    "mongodb": "^3.0.10",
     "body-parser": "^1.18.2",
+    "express": "^4.16.3",
+    "geolib": "^2.0.24",
     "lodash": "^4.17.10",
-    "geolib": "^2.0.24"
+    "mongo-mock": "^3.3.2",
+    "mongodb": "^3.0.10"
   },
   "devDependencies": {
     "chai": "^4.1.2",

@@ -1,6 +1,10 @@
 # INIT
 readme styling guide https://help.github.com/articles/basic-writing-and-formatting-syntax/
 
+# Config
+all configurations are kept in config.js
+there you can change envirionment `environment: 'dev'` or `environment: 'prod'`
+
 
 # Express Server
 if you want to run express server
@@ -62,6 +66,10 @@ if you want to use this do not start express manually.
 ## geolib 2.0.24
 Library to provide basic geospatial operations like distance calculation, conversion of decimal coordinates to sexagesimal and vice versa, etc.
 > compare with your solution
+
+## mongo-mock 3.3.2
+this is used for mocking of mongodb. mocking required unit test because we do not want to cover real mongodb in test. 
+For example, there is a problem in real mongodb not guarantee point-in-time read operation, so after you insert new data (especially bulk data) with unit test, and just after insertion you may not query the data you have inserted. That is breaking unit test.  For more information https://blog.meteor.com/mongodb-queries-dont-always-return-all-matching-documents-654b6594a827
 
 ## crypto-js ^3.1.9-1 (NOT USED)
 keep in mind. may be needed

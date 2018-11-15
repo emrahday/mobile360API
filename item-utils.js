@@ -43,9 +43,15 @@ const itemUtils = {
         let _id = new ObjectID(id);
         return new Promise( (resolve, reject) => {
             dbUtils.connect()
-            .then( db => {
-                db.collection(config.mongo.collections.items).find(_id).toArray()
-                .then ( items => resolve(items));
+            .then( async db => {
+
+                const check = await itemUtils.get();
+                console.log('check', id, check)
+
+                // shortcut .find(_id) is also possible but not supported by mongo-mock
+                items =  await db.collection(config.mongo.collections.items).find({"_id": _id}).toArray()
+                console.log("ITEMS",items);
+                resolve(items);
             });
         });
     },

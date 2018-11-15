@@ -1,5 +1,12 @@
-const {MongoClient} = require('mongodb');
+let {MongoClient} = require('mongodb');
 const config = require('./config');
+var mongodbMock = require('mongo-mock');
+mongodbMock.max_delay = 1000;
+
+if (config.environment === 'dev'){
+    MongoClient = mongodbMock.MongoClient;  
+}
+
 
 const dbUtils = {
     connect: () => {
@@ -18,13 +25,8 @@ const dbUtils = {
             const result = db.executeDbAdminCommand({ serverStatus : 1, repl: 0, metrics: 0, locks: 0 });
             resolve(result);
         });
-    }, 
-    drop: db => {
-        dbUtils.connect()
-        .then ( db => {
-            db.dropDatabase();
-        });
-    }
+    },
+    close: db => db.close
 }
 
 module.exports = dbUtils;
