@@ -1,7 +1,7 @@
 const utils = require('./../utils');
 const itemUtils = require('./../item.utils');
 const chai = require('chai');
-// const should = chai.should();
+const should = chai.should();
 
 describe ('item crud', () => {
 	before(function () {
@@ -59,22 +59,36 @@ describe ('item crud', () => {
 		const latLng = utils.getRandomLatLng();
 		const newLatLng = utils.getRandomLatLng();
 		const created = await itemUtils.create(latLng);
-		const updated = await itemUtils.update({
-			_id: created._id,
-			lat: newLatLng.lat,
-			lng: newLatLng.lng
+		const updated = await itemUtils.update(
+			{
+				_id: created._id.str,
+				lat: newLatLng.lat,
+				lng: newLatLng.lng
+			}
+			);
+			const result = await itemUtils.getByID(created._id);
+			result.length.should.equal(1);
+			result[0]._id.should.equal(created._id);
+			result[0].lat.should.equal(newLatLng.lat);
+			result[0].lng.should.equal(newLatLng.lng);
+			result[0]._id.str.should.equal(updated._id);
+			result[0].lat.should.equal(updated.lat);
+			result[0].lng.should.equal(updated.lng);
 		});
-		const result = await itemUtils.getByID(created._id);
-		result.length.should.equal(1);
-		result[0]._id.should.equal(created._id);
-		result[0].lat.should.equal(newLatLng.lat);
-		result[0].lng.should.equal(newLatLng.lng);
-		result[0]._id.should.equal(updated._id);
-		result[0].lat.should.equal(updated.lat);
-		result[0].lng.should.equal(updated.lng);
+		
+		it ('should delete item by id', async () => {
+			const latLng = utils.getRandomLatLng();
+			const created = await itemUtils.create(latLng);
+			const deleted = await itemUtils.delete({ 
+				_id: created._id 
+			});
+			const result = await itemUtils.getByID(created._id);
+			result.length.should.equal(0);
+			deleted._id.should.equal(created._id);
+	})
 
-	});
-	
+
+
 });
 
 describe ('item search and filter', () => {

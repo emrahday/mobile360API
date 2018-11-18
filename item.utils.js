@@ -53,14 +53,27 @@ const itemUtils = {
 				});
 		});
     },
-    update: query => {
+    update: (data) => {
+        const {_id, ...rest} = data;
         return new Promise( async (resolve) => {
             const db = await dbUtils.connect();
-            const item  = await db.collection(config.mongo.collections.items).update(
-                {_id : query._id}, 
-                {lat: query.lat, lng: query.lng}
+            const result  = await db.collection(config.mongo.collections.items).update(
+                { _id: new ObjectID(_id) }, 
+                rest
             );
-            resolve(query);
+            resolve(data); //TODO check resuld is updated, otherwise return error
+        })
+    },
+    delete: query => {
+        return new Promise( async (resolve) => {
+            const db = await dbUtils.connect();
+            const result = await db.collection(config.mongo.collections.items).remove(
+                query,
+                {
+                    justOne: true
+                }
+            );
+            resolve(query); //TODO check resuld is deleted, otherwise return error
         })
     },
 	getInRectangle: (query) => {

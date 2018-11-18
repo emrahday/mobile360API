@@ -195,6 +195,18 @@ describe ('get items in area', () => {
         //TODO check if item has not lat, lng property
     });
 
+    it ('should update item', async () => {
+        const latLng = utils.getRandomLatLng();
+        const created = await itemUtils.create(latLng);
+        created.lat = 11, 
+        created.lng = 22
+        const res = await chai.request(app)
+        .post(`/update/item`)
+        .send(created);
+        res.statusCode.should.equal(200);
+        res.type.should.equal('application/json');
+    })
+
     it ('should return items in rectangle', async () => {
         const res = await chai.request(app)
         .post(`/get/items/rectangle`)

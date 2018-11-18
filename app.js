@@ -63,6 +63,18 @@ app.get('/get/item', (req, res) => {
     })
 });
 
+app.post('/update/item', async (req, res) => {
+    itemUtils.update(req.body)
+    .then( items => {
+        res.send(items);
+    })
+    .catch( error => {
+        res.send({
+            status: 'Error',
+            message: error
+        })
+    })
+});
 
 app.post('/get/items/rectangle', (req, res) => {
     itemUtils.getInRectangle(req.body)
