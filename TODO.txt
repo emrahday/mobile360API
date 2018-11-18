@@ -3,12 +3,20 @@
    -- how to run dev environment
    -- how to run tests
 
+- write unit test for item.utils.js
+
  - create a nice web interface for development purpose
 
- ? do we really need to seperate movable and non-movable items
- - moveable item stoped in time
- - moveable item faster
- - moveable item slower
+ITEM MODEL
+- items can be different type (user, property, vehicle)
+all types combined as in item table because user want to search anything
+it could be any type. by this way we do not want to search in different 
+tables. search in just one table, show according to type
+
+
+ - user, or vehicle item stoped in time
+ - user, or vehicle item faster
+ - user, or vehicle item slower
 
  - item connection status since given time period
  - get item actual power status
@@ -47,12 +55,12 @@ MOTIVATION AND ORIENTATION
 - mobile app ve web app en son asma
 - mobile icin react native bir alternatif olabilir
 - web icin react bir alternatif olabilir
-- bir ise baslamadan once iyice analiz et, kutuphane kullanmak mi kendin yapmak mi cok iyi dusunerek karar ver. Onemli olan cok zaman kaybetmemek, takilmamak, sonuc en basit hal ile ulasmak
+- bir ise baslamadan once iyice analiz et, kutuphane kullanmak mi kendin yapmak mi cok iyi 
+dusunerek karar ver. Onemli olan cok zaman kaybetmemek, takilmamak, sonuc en basit hal ile ulasmak
 - react native ile konum bilgisi alinabiliyor, background service kaydedilebiliyor. 
 - react icinde bootstrap, material gibi UI kutuphaneleri eklenebiliyor. 
 
-- createMovable ( ? do we really need movable and non-moveable seperation)
-- createStatic ( ? do we really need movable and non-moveable seperation)
+- createItem 
 - createCase
 - createAction
 - createScenerio

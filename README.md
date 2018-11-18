@@ -53,6 +53,11 @@ npm run watch
 it will automatically run the express server, and will start watching. 
 if you want to use this do not start express manually.
 
+if you want to watch and run the test for item.utils.js
+```
+npm run watch-item-utils
+```
+
 # Dependencies
 
 ## express 4.16.3

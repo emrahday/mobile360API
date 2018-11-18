@@ -1,7 +1,6 @@
 let {MongoClient} = require('mongodb');
 const config = require('./config');
 var mongodbMock = require('mongo-mock');
-mongodbMock.max_delay = 1000;
 
 if (config.environment === 'dev'){
     MongoClient = mongodbMock.MongoClient;  
