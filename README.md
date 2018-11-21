@@ -9,11 +9,11 @@ there you can change envirionment `environment: 'dev'` or `environment: 'prod'`
 # Express Server
 if you want to run express server
 ```
-npm app.js
+node app.js
 ```
 it will start listening port and will print out to console
 ```
-> Listening to port 3000
+> Listening to port 3010
 ```
 
 # Database
@@ -34,11 +34,14 @@ if database started and in order to run mongodb command, write
 mongo
 ```
 
+
 `show dbs` Print a list of all databases
 `use <db>` Switch database
 `show collections` Print all collections
 
 for more mongo [shell command](https://docs.mongodb.com/manual/reference/mongo-shell/) 
+
+we are not closing mongodb connection, because there is internal connection pooling. we need to ensure that it is working correctly, may be optimization required. 
 
 # Test
 in order to run mocha test 

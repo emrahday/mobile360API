@@ -93,13 +93,12 @@ describe ('create and get items', () => {
     it ('should return item by id', done => {
         chai.request(app)
         .get(`/get/item?id=${_id}`)
-        .end( (err, {status, type, body:items}) => {
+        .end( (err, {status, type, body:item}) => {
            should.not.exist(err);
            status.should.equal(200);
            type.should.equal('application/json');
-           items.should.be.an('array');
-           items[0]._id.should.not.be.empty;
-           items[0]._id.should.be.equal(_id);
+           item._id.should.not.be.empty;
+           item._id.should.be.equal(_id);
            done();
         });
     });
@@ -138,17 +137,16 @@ describe ('custom property check', () => {
     it ('should have custom properties', done => {
         chai.request(app)
         .get(`/get/item?id=${item._id}`)
-        .end( (err, {status, type, body:items}) => {
+        .end( (err, {status, type, body:item}) => {
            should.not.exist(err);
            status.should.equal(200);
            type.should.equal('application/json');
-           items.should.be.an('array');
-           items[0]._id.should.not.be.empty;
-           items[0]._id.should.be.equal(item._id);
-           items[0].should.include.keys('lat', 'lng', '_id', 'name', 'phone', 'address');
-           items[0].name.should.be.equal(item.name);
-           items[0].phone.should.be.equal(item.phone);
-           items[0].address.should.be.equal(item.address);
+           item._id.should.not.be.empty;
+           item._id.should.be.equal(item._id);
+           item.should.include.keys('lat', 'lng', '_id', 'name', 'phone', 'address');
+           item.name.should.be.equal(item.name);
+           item.phone.should.be.equal(item.phone);
+           item.address.should.be.equal(item.address);
            done();
         });
     });
@@ -260,7 +258,8 @@ describe ('check is item in range', () => {
     it ('should be in circle', (done) => {
         const data = {
             _id: itemIn._id,
-            point: { lat: 40, lng: 40 },
+            lat: 40, 
+            lng: 40,
             radius: radius
         };
         chai.request(app)
@@ -272,8 +271,6 @@ describe ('check is item in range', () => {
             type.should.equal('application/json');
             result.should.not.be.empty;
             result._id.should.be.equal(data._id);
-            result.point.lat.should.be.equal(data.point.lat);
-            result.point.lng.should.be.equal(data.point.lng);
             result.inCircle.should.be.true;
             done();
         });
@@ -294,8 +291,6 @@ describe ('check is item in range', () => {
             type.should.equal('application/json');
             result.should.not.be.empty;
             result._id.should.be.equal(data._id);
-            result.point.lat.should.be.equal(data.point.lat);
-            result.point.lng.should.be.equal(data.point.lng);
             result.inCircle.should.be.false;
             done();
         });

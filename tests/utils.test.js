@@ -158,6 +158,33 @@ describe ('check point is inside', () => {
         distance3.should.not.lessThan(radious);
         distance4.should.not.lessThan(radious);
     });
+
+    it('should remove private properties, such as password', () => {
+        const result = utils.removePrivateProps({
+            password: 'secret',
+            name: 'john'
+        });
+        result.password.should.equal('');
+        result.name.should.equal('john');
+    })
+
+    it('should check given object has only one property and that property matching with given one', () => {
+        let result = utils.isOnlyProperty({
+            _id: 123
+        }, '_id');
+        result.should.be.true;
+
+        result = utils.isOnlyProperty({
+            name: 'john',
+            _id: 123
+        }, '_id');
+        result.should.be.false;
+        
+        result = utils.isOnlyProperty({
+            name: 'john'
+        }, '_id');
+        result.should.be.false;
+    });
     
 });
 
