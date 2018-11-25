@@ -5,7 +5,7 @@ chai.use(chaiHttp);
 
 describe ('utils', () => {
     
-    before(function() {
+    before( function () {
         // this.skip();
     });
 
@@ -23,7 +23,7 @@ describe ('utils', () => {
 describe ('distance calculations', () => {
 
     // according to test result harversine formula is better match with google maps
-    before(function() {
+    before(function () {
         // this.skip();
     });
 
@@ -31,8 +31,8 @@ describe ('distance calculations', () => {
         const point1 = {lat:30, lng:20};
         const point2 = {lat:30, lng:21};
         const distance = 96300; // according to google maps
-        const harversine = utils.getHaversineDistance(point1, point2, -1)
-        const geolibSimple = utils.getGeolibDistanceSimple(point1, point2, -1)
+        const harversine = utils.getHaversineDistance(point1, point2, -1);
+        const geolibSimple = utils.getGeolibDistanceSimple(point1, point2, -1);
         const geolib = utils.getGeolibDistance(point1, point2, -1);
         distance.should.be.equal(harversine);
         // geolib is not precise so it needs some corrections
@@ -44,8 +44,8 @@ describe ('distance calculations', () => {
         const point1 = {lat:41, lng:-107};
         const point2 = {lat:41, lng:-100};
         const distance = 587280; // according to google maps
-        const harversine = utils.getHaversineDistance(point1, point2, -1)
-        const geolibSimple = utils.getGeolibDistanceSimple(point1, point2, -1)
+        const harversine = utils.getHaversineDistance(point1, point2, -1);
+        const geolibSimple = utils.getGeolibDistanceSimple(point1, point2, -1);
         const geolib = utils.getGeolibDistance(point1, point2, -1);
         distance.should.be.equal(harversine);
         // geolib is not precise so it needs some corrections
@@ -57,8 +57,8 @@ describe ('distance calculations', () => {
         const point1 = {lat:46, lng:-121};
         const point2 = {lat:38, lng:-121};
         const distance = 889560; // according to google maps
-        const harversine = utils.getHaversineDistance(point1, point2, -1)
-        const geolibSimple = utils.getGeolibDistanceSimple(point1, point2, -1)
+        const harversine = utils.getHaversineDistance(point1, point2, -1);
+        const geolibSimple = utils.getGeolibDistanceSimple(point1, point2, -1);
         const geolib = utils.getGeolibDistance(point1, point2, -1);
         distance.should.be.equal(harversine);
         // geolib is not precise so it needs some corrections
@@ -70,8 +70,8 @@ describe ('distance calculations', () => {
         const point1 = {lat:54.676225, lng:9.636944};
         const point2 = {lat:47.895890, lng:12.533485};
         const distance = 780210; // according to google maps
-        const harversine = utils.getHaversineDistance(point1, point2, -1)
-        const geolibSimple = utils.getGeolibDistanceSimple(point1, point2, -1)
+        const harversine = utils.getHaversineDistance(point1, point2, -1);
+        const geolibSimple = utils.getGeolibDistanceSimple(point1, point2, -1);
         const geolib = utils.getGeolibDistance(point1, point2, -1);
         distance.should.be.equal(harversine);
         // geolib is not precise so it needs some corrections
@@ -83,8 +83,8 @@ describe ('distance calculations', () => {
         const point1 = {lat:51.701299, lng:14.401495};
         const point2 = {lat:50.034434, lng:6.274386};
         const distance = 599310; // according to google maps
-        const harversine = utils.getHaversineDistance(point1, point2, -1)
-        const geolibSimple = utils.getGeolibDistanceSimple(point1, point2, -1)
+        const harversine = utils.getHaversineDistance(point1, point2, -1);
+        const geolibSimple = utils.getGeolibDistanceSimple(point1, point2, -1);
         const geolib = utils.getGeolibDistance(point1, point2, -1);
         distance.should.be.equal(harversine);
         // geolib is not precise so it needs some corrections
@@ -95,7 +95,7 @@ describe ('distance calculations', () => {
 
 describe ('check point is inside', () => {
     
-    before(function() {
+    before(function () {
         // this.skip();
     });
 
@@ -135,7 +135,7 @@ describe ('check point is inside', () => {
             { lat: 6, lng: 8},
             { lat: 1, lng: 7},
             { lat: 2, lng: 2},
-        ]
+        ];
         const rectangle = [
             { lat: 7, lng: 1},
             { lat: 1, lng: 8},
@@ -166,7 +166,7 @@ describe ('check point is inside', () => {
         });
         result.password.should.equal('');
         result.name.should.equal('john');
-    })
+    });
 
     it('should check given object has only one property and that property matching with given one', () => {
         let result = utils.isOnlyProperty({

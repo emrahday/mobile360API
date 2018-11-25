@@ -13,8 +13,7 @@
     "rules": {
         "space-before-function-paren": ["error", "always"],
         "indent": [
-            "error",
-            "tab"
+            "error"
         ],
         "linebreak-style": 0,
         "quotes": [

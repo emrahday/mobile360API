@@ -14,7 +14,7 @@ chai.use(chaiHttp);
 
 describe ('init', () => {
 
-    before(function() {
+    before(function () {
         // this.skip();
     });
 
@@ -27,14 +27,14 @@ describe ('init', () => {
             res.type.should.equal('application/json');
             res.body.status.should.equal('OK');
             done();
-        })
+        });
     });
 });
 
 describe ('create and get items', () => {
     let latLng;
     let _id;
-    before(function() {
+    before(function () {
         // this.skip();
         latLng = utils.getRandomLatLng();
     });
@@ -53,7 +53,7 @@ describe ('create and get items', () => {
             item.lat.should.equal(latLng.lat);
             item.lat.should.equal(latLng.lat);
             done();
-        })
+        });
     });
 
     it ('should create multiple items and return created items', (done) => {
@@ -67,13 +67,13 @@ describe ('create and get items', () => {
             items[0].should.include.keys('lat', 'lng', '_id');
             items[1].should.include.keys('lat', 'lng', '_id');
             done();
-        })
+        });
     });
 
     it ('should return items by exactly matching lat/lng', (done) => {
         // we are using post because minus lat/lng goes as string, but we need number
         chai.request(app)
-        .post(`/get/items`)
+        .post('/get/items')
         .send(latLng)
         .end((err, {status, type, body:items }) =>{
             should.not.exist(err);
@@ -86,7 +86,7 @@ describe ('create and get items', () => {
             items[0].lat.should.equal(latLng.lat);
             items[0].lng.should.equal(latLng.lng);
             done();
-        })
+        });
     });
 
 
@@ -94,19 +94,19 @@ describe ('create and get items', () => {
         chai.request(app)
         .get(`/get/item?id=${_id}`)
         .end( (err, {status, type, body:item}) => {
-           should.not.exist(err);
-           status.should.equal(200);
-           type.should.equal('application/json');
-           item._id.should.not.be.empty;
-           item._id.should.be.equal(_id);
-           done();
+            should.not.exist(err);
+            status.should.equal(200);
+            type.should.equal('application/json');
+            item._id.should.not.be.empty;
+            item._id.should.be.equal(_id);
+            done();
         });
     });
 });
 
 describe ('custom property check', () => {
     let item;
-    before(function() {
+    before(function () {
         // this.skip();
         item = {
             lat: 30,
@@ -114,7 +114,7 @@ describe ('custom property check', () => {
             name: 'sample name',
             phone: '123456789',
             address: 'sample address'
-        }
+        };
     });
 
     it ('should create item with custom property', (done) => {
@@ -138,16 +138,16 @@ describe ('custom property check', () => {
         chai.request(app)
         .get(`/get/item?id=${item._id}`)
         .end( (err, {status, type, body:item}) => {
-           should.not.exist(err);
-           status.should.equal(200);
-           type.should.equal('application/json');
-           item._id.should.not.be.empty;
-           item._id.should.be.equal(item._id);
-           item.should.include.keys('lat', 'lng', '_id', 'name', 'phone', 'address');
-           item.name.should.be.equal(item.name);
-           item.phone.should.be.equal(item.phone);
-           item.address.should.be.equal(item.address);
-           done();
+            should.not.exist(err);
+            status.should.equal(200);
+            type.should.equal('application/json');
+            item._id.should.not.be.empty;
+            item._id.should.be.equal(item._id);
+            item.should.include.keys('lat', 'lng', '_id', 'name', 'phone', 'address');
+            item.name.should.be.equal(item.name);
+            item.phone.should.be.equal(item.phone);
+            item.address.should.be.equal(item.address);
+            done();
         });
     });
 });
@@ -165,12 +165,6 @@ describe ('get items in area', () => {
             { lat: 7, lng: 1},
             { lat: 1, lng: 8},
         ];
-        polygon = [
-            { lat: 7, lng: 1},
-            { lat: 6, lng: 8},
-            { lat: 1, lng: 7},
-            { lat: 2, lng: 2},
-        ]
         items = [
             { lat: 7, lng: 1},          //[0]  in rectangle, in polygon distance:554295.67
             { lat: 1, lng: 8},          //[1]  in rectangle, not in polygon distance: 471508.55
@@ -185,7 +179,7 @@ describe ('get items in area', () => {
             { lat: 0.5, lng: 3},        //[10]  not in distance: 448138.82
             { lat: 6, lng: 9},          //[11]  not in distance: 495744.39
             { lat: 7.000001, lng: 1},   //[12]  not in 554295.74
-        ]
+        ];
 
         await itemUtils.createBulk(items);
 
@@ -197,17 +191,17 @@ describe ('get items in area', () => {
         const latLng = utils.getRandomLatLng();
         const created = await itemUtils.create(latLng);
         created.lat = 11, 
-        created.lng = 22
+        created.lng = 22;
         const res = await chai.request(app)
-        .post(`/update/item`)
+        .post('/update/item')
         .send(created);
         res.statusCode.should.equal(200);
         res.type.should.equal('application/json');
-    })
+    });
 
     it ('should return items in rectangle', async () => {
         const res = await chai.request(app)
-        .post(`/get/items/rectangle`)
+        .post('/get/items/rectangle')
         .send(rectangle);
         should.not.exist(res.err);
         res.statusCode.should.equal(200);
@@ -218,7 +212,7 @@ describe ('get items in area', () => {
 
     it ('should return items in circle', async () => {
         const res = await chai.request(app)
-        .post(`/get/items/circle`)
+        .post('/get/items/circle')
         .send({
             lat: circle.lat,
             lng: circle.lng,
@@ -234,14 +228,14 @@ describe ('get items in area', () => {
 
 describe ('check is item in range', () => {
 
-    let center, itemIn, radius;
+    let itemIn, itemOut, radius;
     before( async () => {
         // this.skip();
         itemIn = {lat:41, lng:41};
         itemOut = {lat:41.0025, lng:41.0025};
         radius = 140000;
 
-        const result = await itemUtils.createBulk([itemIn, itemOut])
+        const result = await itemUtils.createBulk([itemIn, itemOut]);
         result[0].should.include.keys('lat', 'lng', '_id');
         result[0]._id.should.not.be.empty;
         result[0].lat.should.equal(itemIn.lat);
