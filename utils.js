@@ -123,33 +123,42 @@ const utils = {
         return false;
     },
 	
-	//TODO authentication
+    //TODO authentication
+    
+    registerUser:(email, password, type) => {
+        return ''; //TODO complete this function
+    },
 	
-	// getToken: (email, password) => {
-	// 	const credential = encodeUserCredential();
-	// 	// check is credential matching with db credential
-	// 	const tokenData = {
-	// 		credential,
-	// 		expires: getTokenExpires()
-	// 		permissions
-	// 	};
-	// },
+    getToken: (email, password, permissions) => {
+        const credential = utils.encodeUserCredential(email, password);
+		// check is credential matching with db credential
+        const tokenData = {
+            credential,
+            expires: utils.getTokenExpires(),
+            permissions
+        };
+        return utils.encodeToken(tokenData);
+    },
     
-	// encodeUserCredential: (email, password) => {
-	// 	return jwt.sign(`${email}:${password}`, config.token.secret);
-	// },
+    encodeUserCredential: (email, password) => {
+        return jwt.sign(`${email}:${password}`, config.token.credentialSecret);
+    },
     
-	// decodeUserCredential: hash => {
-	// 	return jwt.verify(hash, config.hash.secret);
-	// },
+    decodeUserCredential: hash => {
+        return jwt.verify(hash, config.token.credentialSecret);
+    },
     
-	// encodeToken: data => {
-	// 	return jwt.sign(data, config.token.secret);
-    // }
+    encodeToken: data => {
+        return jwt.sign(data, config.token.tokenSecret);
+    },
+
+    decodeToken: hash => {
+        return jwt.verify(hash, config.token.tokenSecret);
+    },
     
-    // getTokenExpires: () => {
-    //     return "current date" + config.expires
-    // }
+    getTokenExpires: () => {
+        return (new Date()).getTime() + config.token.expires;
+    }
 };
 
 module.exports = utils;

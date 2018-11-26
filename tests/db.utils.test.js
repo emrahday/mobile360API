@@ -7,7 +7,7 @@ chai.use(chaiHttp);
 
 describe ('database status', () => {
     
-    before( () => {
+    before( function () {
         // executeDBAdminCommand is not supported by mongo-mock so skipped for dev environment
         if (config.environment === 'dev'){ 
             this.skip();

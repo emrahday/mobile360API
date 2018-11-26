@@ -185,7 +185,54 @@ describe ('check point is inside', () => {
         }, '_id');
         result.should.be.false;
     });
+});
+
+describe ('authentication', () => {
     
+    before(function () {
+        // this.skip();
+    });
+
+    it('should return token expires date in millisecond', () => {
+        const expiresInMillisecond = utils.getTokenExpires();
+        expiresInMillisecond.should.greaterThan(0);
+    });
+    
+    it('should encode/decode token data', () => {
+        const tokenData = {
+            credential: 'XYZ',
+            expires: utils.getTokenExpires(),
+            permission: '10101'
+        };
+        const encoded = utils.encodeToken(tokenData);
+        encoded.should.not.be.empty;
+        const decoded = utils.decodeToken(encoded);
+        decoded.should.not.be.empty;
+        decoded.credential.should.be.equal(tokenData.credential);
+        decoded.expires.should.be.equal(tokenData.expires);
+        decoded.permission.should.be.equal(tokenData.permission);
+    });
+
+    it('should encode/decode credential data', () => {
+        const email = 'email';
+        const password = 'password';
+        const encoded = utils.encodeUserCredential(email, password);
+        encoded.should.not.be.empty;
+        const decoded = utils.decodeUserCredential(encoded);
+        decoded.should.not.be.empty;
+        decoded.should.be.equal(`${email}:${password}`);
+    });
+    
+    it('should register new user with permission', () => {
+        const email = 'email';
+        const password = 'password';
+        const type = 'simple';
+
+        const token = utils.registerUser(email, password, type);
+        token.should.not.be.empty;
+    });
+
+
 });
 
 

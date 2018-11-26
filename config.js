@@ -10,8 +10,9 @@ const config = {
         }
     },
     token: {
-        passwordSecret : 'changeThis',
-        expires: 1000 * 60 * 60
+        tokenSecret : 'changeThis',
+        credentialSecret : 'changeThis',
+        expires: 1000 * 60 * 60 * 24
     }
 };
 
