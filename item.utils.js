@@ -13,28 +13,30 @@ const itemUtils = {
         }
         return new Promise( (resolve, reject) => {
             dbUtils.connect()
-				.then(db => {
-    db.collection(config.mongo.collections.items).insertOne(item, (err, result) => {
-        if (err) {
-            reject(err);
-        }
-        const data = utils.removePrivateProps(result.ops[0]); // for example never return password
-        resolve(data);
-    });
-});
+            .then(db => {
+                db.collection(config.mongo.collections.items)
+                .insertOne(item, (err, result) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    const data = utils.removePrivateProps(result.ops[0]); // for example never return password
+                    resolve(data);
+                });
+            });
         });
     },
     createBulk : items => {
         return new Promise( (resolve, reject) => {
             dbUtils.connect()
-				.then(db => {
-    db.collection(config.mongo.collections.items).insert(items, (err, result) => {
-        if (err){
-            reject(err);
-        }
-        resolve(result.ops);
-    });
-});
+            .then(db => {
+                db.collection(config.mongo.collections.items)
+                .insert(items, (err, result) => {
+                    if (err){
+                        reject(err);
+                    }
+                    resolve(result.ops);
+                });
+            });
         });
     },
     get: query => {
@@ -53,12 +55,12 @@ const itemUtils = {
         let _id = new ObjectID(id);
         return new Promise( (resolve) => {
             dbUtils.connect()
-				.then( async db => {
-					// shortcut way .find(_id) is also possible but not supported by mongo-mock
-    const item =  await db.collection(config.mongo.collections.items)
-						.findOne({'_id': _id});
-    resolve(item);
-});
+            .then( async db => {
+                // shortcut way .find(_id) is also possible but not supported by mongo-mock
+                const item =  await db.collection(config.mongo.collections.items)
+                                    .findOne({'_id': _id});
+                resolve(item);
+            });
         });
     },
     update: (data) => {
@@ -122,7 +124,6 @@ const itemUtils = {
             resolve(filteredItems);
         });
     },
-
 
     isInCircleRadius: (query) => {
         return new Promise ( async (resolve, reject) => { 
@@ -204,7 +205,6 @@ const itemUtils = {
         });
     },
 
-
     getFromHistory: (idStr) => {
         return new Promise( async (resolve) => {
             const db = await dbUtils.connect();
@@ -212,7 +212,20 @@ const itemUtils = {
             const history = await db.collection(config.mongo.collections.history).find(query).toArray();
             resolve(history);
         });
-    }
+    },
+
+    registerUser:({email, password, userType}) => {
+        const created = itemUtils.create({
+            type: 'person',
+            email,
+            password
+        });
+        const permission = utils.getPermission(userType);
+        if (created._id){
+            return utils.getToken(email, password, permission);
+        }
+        throw new Error('User register error');
+    },
 
 };
 

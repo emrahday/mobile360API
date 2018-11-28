@@ -17,26 +17,6 @@ describe ('item crud', () => {
         result.lng.should.equal(lng);
     });
 
-    it ('should create an user', async () => {
-        const latLng = utils.getRandomLatLng();
-        const user = {
-            firstname: 'John',
-            lastname: 'Doe',
-            email: 'john.doe@example.com',
-            password: 'secret'
-        };
-        const data = Object.assign(latLng, user);
-        const result = await itemUtils.create(data);
-        result.should.include.keys('lat', 'lng', '_id', 'firstname', 'lastname', 'email');
-        result._id.should.not.equal(null);
-        result.lat.should.equal(latLng.lat);
-        result.lng.should.equal(latLng.lng);
-        result.firstname.should.equal(user.firstname);
-        result.lastname.should.equal(user.lastname);
-        result.email.should.equal(user.email);
-        result.password.should.equal('');
-    });
-
     it ('should return error if creation type is wrong', async () => {
         const result = await itemUtils.create(null);
         result.should.be.instanceOf(Error).with.property('message', 'Wrong argument ! "object" expected');
@@ -251,13 +231,123 @@ describe ('item search and filter', () => {
 
 });
 
- //TODO complete
-describe ('different item types', () => {
+describe ('user', () => {
     
     before(function () {
-        this.skip();
+        // this.skip();
     });
 
-    it ('should creat an item as user type', () => {
+    it ('should create an user', async () => {
+        const latLng = utils.getRandomLatLng();
+        const user = {
+            firstname: 'John',
+            lastname: 'Doe',
+            email: 'john.doe@example.com',
+            password: 'secret'
+        };
+        const data = Object.assign(latLng, user);
+        const result = await itemUtils.create(data);
+        result.should.include.keys('lat', 'lng', '_id', 'firstname', 'lastname', 'email');
+        result._id.should.not.equal(null);
+        result.lat.should.equal(latLng.lat);
+        result.lng.should.equal(latLng.lng);
+        result.firstname.should.equal(user.firstname);
+        result.lastname.should.equal(user.lastname);
+        result.email.should.equal(user.email);
+        result.password.should.equal('');
     });
+
+    it('should register new user with type', () => {
+        const email = 'email';
+        const password = 'password';
+        const type = 'simple';
+
+        const token = itemUtils.registerUser(email, password, type);
+        token.should.not.be.empty;
+    });
+
+    it('should get user list', async () => {
+        const users = [];
+        users.should.not.be.empty;
+    });   
+
+    it('should get user list by type', async () => {
+        const users = [];
+        users.should.not.be.empty;
+    });   
+
+    it('should get single user', async () => {
+        const user = undefined;
+        user.should.exist;
+    });   
+
+    it('should update single user', async () => {
+        const user = undefined;
+        user.should.exist;
+    });   
+
+    it('should remove single user', async () => {
+        const user = undefined;
+        user.should.exist;
+    });   
+
+});
+
+describe ('shapes and areas', () => {
+    
+    before(function () {
+        // this.skip();
+    });
+
+    it('should create circle', async () => {
+        const shape = undefined;
+        shape.should.exist;
+    });   
+    
+    it('should create rectangle', async () => {
+        const shape = undefined;
+        shape.should.exist;
+    });   
+    
+});
+
+describe ('item relations', () => {
+    
+    before(function () {
+        // this.skip();
+    });
+
+    it('shuld check user nearby property', async () => {
+        false.should.be.true;
+    });   
+    
+    it('should check vehicle nearby property', async () => {
+        false.should.be.true;
+    });   
+    
+    it('should check user in rectangle shape', async () => {
+        false.should.be.true;
+    });   
+
+    it('should check user in circle shape ', async () => {
+        false.should.be.true;
+    });   
+   
+    it('should vehicle in rectangle shape ', async () => {
+        false.should.be.true;
+    });   
+       
+    it('should check vehicle in circle shape ', async () => {
+        false.should.be.true;
+    });   
+       
+    it('should return distance between items', async () => {
+        false.should.be.true;
+    });   
+       
+    it('get closest user to user ', async () => {
+        false.should.be.true;
+    });   
+
+    
 });

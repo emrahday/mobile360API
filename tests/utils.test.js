@@ -187,7 +187,7 @@ describe ('check point is inside', () => {
     });
 });
 
-describe ('authentication', () => {
+describe ('encode decode', () => {
     
     before(function () {
         // this.skip();
@@ -223,18 +223,21 @@ describe ('authentication', () => {
         decoded.should.be.equal(`${email}:${password}`);
     });
     
-    it('should register new user with permission', () => {
-        const email = 'email';
-        const password = 'password';
-        const type = 'simple';
-
-        const token = utils.registerUser(email, password, type);
-        token.should.not.be.empty;
-    });
-
-
 });
 
+
+describe ('permission', () => {
+    
+    before(function () {
+        // this.skip();
+    });
+
+    it('should get permission by user type', () => {
+        const permission = utils.getPermission();
+        permission.should.not.be.empty;
+    });
+    
+});
 
 
 

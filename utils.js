@@ -2,6 +2,7 @@ const lodash = require('lodash');
 const geolib = require('geolib');
 const jwt = require('jsonwebtoken');
 const config = require('./config');
+const itemUtils = require('./item.utils');
 
 const utils = {
     getRandomLatLng: () => {
@@ -124,11 +125,11 @@ const utils = {
     },
 	
     //TODO authentication
-    
-    registerUser:(email, password, type) => {
-        return ''; //TODO complete this function
+
+    getPermission: (userType) => {
+        //TODO
     },
-	
+    
     getToken: (email, password, permissions) => {
         const credential = utils.encodeUserCredential(email, password);
 		// check is credential matching with db credential
