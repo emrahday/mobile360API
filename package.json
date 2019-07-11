@@ -21,7 +21,7 @@
     "express": "^4.16.3",
     "geolib": "^2.0.24",
     "jsonwebtoken": "^8.2.1",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.13",
     "mongo-mock": "^3.3.2",
     "mongodb": "^3.0.10"
   },
